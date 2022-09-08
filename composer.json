@@ -1,0 +1,34 @@
+{
+    "name": "wellkit/workerman-runtime",
+    "type": "library",
+    "license": "MIT",
+    "description": "symfony workerman runtime",
+    "keywords": ["workerman", "symfony", "runtime", "php-runtime"],
+    "homepage": "https://github.com/niqingyang/workerman-runtime",
+    "minimum-stability": "stable",
+    "authors": [
+        {
+            "name": "niqingyang",
+            "email": "niqy@qq.com"
+        }
+    ],
+    "require": {
+        "symfony/runtime": "^6.0",
+        "symfony/http-kernel": "^6.0",
+        "workerman/workerman": "^4.0",
+        "php": ">=8.0.2",
+        "chubbyphp/chubbyphp-workerman-request-handler": "^2.0",
+        "nyholm/psr7": "^1.5",
+        "symfony/psr-http-message-bridge": "^2.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "WellKit\\WorkermanRuntime\\": "src/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "symfony/runtime": true
+        }
+    }
+}
