@@ -1,11 +1,12 @@
 {
-    "name": "wellkit/workerman-runtime",
-    "type": "library",
+    "name": "wellkit/workerman-bundle",
+    "type": "symfony-bundle",
     "license": "MIT",
-    "description": "symfony workerman runtime",
+    "description": "symfony workerman bundle",
     "keywords": ["workerman", "symfony", "runtime", "php-runtime"],
     "homepage": "https://github.com/niqingyang/workerman-runtime",
     "minimum-stability": "stable",
+    "prefer-stable": true,
     "authors": [
         {
             "name": "niqingyang",
@@ -14,21 +15,31 @@
     ],
     "require": {
         "symfony/runtime": "^6.0",
-        "symfony/http-kernel": "^6.0",
+        "symfony/http-kernel": "^6.1",
         "workerman/workerman": "^4.0",
         "php": ">=8.0.2",
-        "chubbyphp/chubbyphp-workerman-request-handler": "^2.0",
         "nyholm/psr7": "^1.5",
-        "symfony/psr-http-message-bridge": "^2.1"
+        "symfony/psr-http-message-bridge": "^2.1",
+        "league/mime-type-detection": "^1.11",
+        "workerman/psr7": "^1.4",
+        "symfony/config": "^6.1",
+        "symfony/dependency-injection": "^6.1",
+        "symfony/yaml": "^6.1"
     },
     "autoload": {
         "psr-4": {
-            "WellKit\\WorkermanRuntime\\": "src/"
+            "WellKit\\WorkermanBundle\\": "src/"
         }
     },
     "config": {
+        "sort-packages": true,
         "allow-plugins": {
             "symfony/runtime": true
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "0.0.2-dev"
         }
     }
 }
