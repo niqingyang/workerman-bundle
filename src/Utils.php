@@ -116,9 +116,6 @@ class Utils
         }
 
         $worker->onWorkerStart = function ($worker) use ($config) {
-
-            echo "other worker onWorkerStart run\n";
-
             foreach ($config['services'] ?? [] as $server) {
                 if (!\class_exists($server['handler'])) {
                     echo "process error: class {$server['handler']} not exists\r\n";
