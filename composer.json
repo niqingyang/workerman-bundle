@@ -5,7 +5,7 @@
     "description": "symfony workerman bundle",
     "keywords": ["workerman", "symfony", "runtime", "php-runtime"],
     "homepage": "https://github.com/niqingyang/workerman-runtime",
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "prefer-stable": true,
     "authors": [
         {
@@ -14,17 +14,20 @@
         }
     ],
     "require": {
-        "symfony/runtime": "^6.0",
-        "symfony/http-kernel": "^6.1",
-        "workerman/workerman": "^4.0",
         "php": ">=8.0.2",
-        "nyholm/psr7": "^1.5",
-        "symfony/psr-http-message-bridge": "^2.1",
         "league/mime-type-detection": "^1.11",
-        "workerman/psr7": "^1.4",
+        "nyholm/psr7": "^1.5",
         "symfony/config": "^6.1",
         "symfony/dependency-injection": "^6.1",
-        "symfony/yaml": "^6.1"
+        "symfony/finder": "^6.1",
+        "symfony/http-kernel": "^6.1",
+        "symfony/psr-http-message-bridge": "^2.1",
+        "symfony/runtime": "^6.0",
+        "symfony/yaml": "^6.1",
+        "workerman/psr7": "^1.4",
+        "workerman/workerman": "^4.0",
+        "ext-posix": "*",
+        "ext-pcntl": "*"
     },
     "autoload": {
         "psr-4": {
@@ -39,7 +42,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "1.0.1"
+            "dev-master": "1.0.2"
         }
     }
 }

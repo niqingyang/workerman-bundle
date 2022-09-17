@@ -16,35 +16,47 @@
 
 namespace WellKit\WorkermanBundle\Process;
 
+use Symfony\Component\Filesystem\Path;
+use Symfony\Component\Finder\Finder;
 use Workerman\Timer;
 use Workerman\Worker;
 
 /**
  * Class FileMonitor
+ *
  * @package process
  */
 class Monitor
 {
-    /**
-     * @var array
-     */
-    protected array $_paths = [];
+    protected ?string $basePath = null;
 
-    /**
-     * @var array
-     */
-    protected array $_extensions = [];
+    protected array|string $resource = [];
+
+    protected array|string $patterns = [];
+
+    protected array|string $exclude = [];
+
+    protected float|int|null $memoryLimit = null;
 
     /**
      * FileMonitor constructor.
-     * @param $monitor_dir
-     * @param $monitor_extensions
-     * @param $memory_limit
+     * @param array|string $resource
+     * @param array|string $patterns
+     * @param array|string $exclude
+     * @param float|int|null $memoryLimit
+     * @param string|null $basePath
      */
-    public function __construct($monitor_dir, $monitor_extensions, $memory_limit = null)
+    public function __construct(array|string $resource, array|string $patterns = [], array|string $exclude = [], float|int|null $memoryLimit = null, string $basePath = null)
     {
-        $this->_paths = (array)$monitor_dir;
-        $this->_extensions = $monitor_extensions;
+        $this->exclude = (array)$exclude;
+        $this->resource = (array)$resource;
+        $this->patterns = $patterns;
+        $this->basePath = $basePath;
+        $this->memoryLimit = $memoryLimit;
+    }
+
+    public function onWorkerStart(): void
+    {
         if (!Worker::getAllWorkers()) {
             return;
         }
@@ -54,80 +66,88 @@ class Monitor
         } else {
             if (!Worker::$daemonize) {
                 Timer::add(1, function () {
-                    $this->checkAllFilesChange();
+                    $this->checkFilesChange();
                 });
             }
         }
 
-        $memory_limit = $this->getMemoryLimit($memory_limit);
+        $memory_limit = $this->getMemoryLimit($this->memoryLimit);
         if ($memory_limit && DIRECTORY_SEPARATOR === '/') {
             Timer::add(60, [$this, 'checkMemory'], [$memory_limit]);
         }
     }
 
     /**
-     * @param $monitor_dir
-     * @return bool|void
-     */
-    public function checkFilesChange($monitor_dir)
-    {
-        static $last_mtime, $too_many_files_check;
-        if (!$last_mtime) {
-            $last_mtime = time();
-        }
-        clearstatcache();
-        if (!is_dir($monitor_dir)) {
-            if (!is_file($monitor_dir)) {
-                return;
-            }
-            $iterator = [new \SplFileInfo($monitor_dir)];
-        } else {
-            // recursive traversal directory
-            $dir_iterator = new \RecursiveDirectoryIterator($monitor_dir, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS);
-            $iterator = new \RecursiveIteratorIterator($dir_iterator);
-        }
-        $count = 0;
-        foreach ($iterator as $file) {
-            $count++;
-            /** var SplFileInfo $file */
-            if (is_dir($file)) {
-                continue;
-            }
-            // check mtime
-            if ($last_mtime < $file->getMTime() && in_array($file->getExtension(), $this->_extensions, true)) {
-                $var = 0;
-                exec('"' . PHP_BINARY . '" -l ' . $file, $out, $var);
-                if ($var) {
-                    $last_mtime = $file->getMTime();
-                    continue;
-                }
-                $last_mtime = $file->getMTime();
-                echo $file . " update and reload\n";
-                // send SIGUSR1 signal to master process for reload
-                if (DIRECTORY_SEPARATOR === '/') {
-                    posix_kill(posix_getppid(), SIGUSR1);
-                } else {
-                    return true;
-                }
-                break;
-            }
-        }
-        if (!$too_many_files_check && $count > 1000) {
-            echo "Monitor: There are too many files ($count files) in $monitor_dir which makes file monitoring very slow\n";
-            $too_many_files_check = 1;
-        }
-    }
-
-    /**
      * @return bool
      */
-    public function checkAllFilesChange(): bool
+    public function checkFilesChange(): bool
     {
-        foreach ($this->_paths as $path) {
-            if ($this->checkFilesChange($path)) {
-                return true;
+        if ($this->basePath) {
+            foreach ($this->resource as $i => $path) {
+                $this->resource[$i] = Path::makeAbsolute($path, $this->basePath);
+            }
+            foreach ($this->exclude as $i => $path) {
+                $this->exclude[$i] = Path::makeAbsolute($path, $this->basePath);
             }
         }
+
+        $finder = new Finder();
+        $finder->files();
+
+        if ($this->patterns) {
+            $finder->name($this->patterns);
+        }
+
+        if ($this->resource) {
+            $finder->in($this->resource);
+        }
+
+        if ($this->exclude) {
+            $finder->exclude($this->exclude);
+        }
+
+        if ($finder->hasResults()) {
+
+            static $last_mtime, $too_many_files_check;
+
+            if (!$last_mtime) {
+                $last_mtime = time();
+            }
+
+            clearstatcache();
+
+            $count = 0;
+
+            foreach ($finder as $file) {
+
+                $count += 1;
+
+                // check mtime
+                if ($last_mtime < $file->getMTime()) {
+                    $var = 0;
+                    exec('"' . PHP_BINARY . '" -l ' . $file, $out, $var);
+                    if ($var) {
+                        $last_mtime = $file->getMTime();
+                        continue;
+                    }
+                    $last_mtime = $file->getMTime();
+                    echo $file . " update and reload\n";
+                    // send SIGUSR1 signal to master process for reload
+                    if (DIRECTORY_SEPARATOR === '/') {
+                        posix_kill(posix_getppid(), SIGUSR1);
+                    } else {
+                        return true;
+                    }
+                    break;
+                }
+            }
+
+            if (!$too_many_files_check && $count > 1000) {
+                echo "Monitor: There are too many files ($count files) which makes file monitoring very slow\n";
+                $too_many_files_check = 1;
+            }
+        }
+
         return false;
     }
 
