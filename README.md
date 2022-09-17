@@ -72,6 +72,23 @@ workerman.xxx:
     tags: [ 'workerman.process' ]
 ```
 
+## 监听文件变动自动重启
+
+```yaml
+workerman.monitor:
+    class: WellKit\WorkermanBundle\Process\Monitor
+    arguments:
+        # the base dir
+        $basePath: '%kernel.project_dir%'
+        # the monitor dirs
+        $resource: [ './src/', './config/', './public/', './templates/' ]
+        # the file name patterns
+        $patterns: [ '*.php', '*.yaml', '*.html', '*.htm', '*.twig' ]
+        # the exclude dirs
+        $exclude: []
+    tags: [ 'workerman.process' ]
+```
+
 ## 启动
 
 在项目根目录下执行

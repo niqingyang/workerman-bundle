@@ -82,6 +82,8 @@ class Runner implements RunnerInterface
          */
         $container = $this->kernel->getContainer();
 
+        echo get_class($container) . "\n";
+
         $this->environment = $container->getParameter('kernel.environment');
         $config = $this->getMasterConfig($container->getParameter('workerman.server'));
 
