@@ -83,21 +83,28 @@ class WorkermanExtension extends Extension
                 }
             }
 
-            $services[$id]['public'] = true;
-            $services[$id]['autowire'] = true;
+            if (!isset($services[$id]['public'])) {
+                $services[$id]['public'] = true;
+            }
+
+            if (!isset($services[$id]['autowire'])) {
+                $services[$id]['autowire'] = true;
+            }
         }
 
         $content = Yaml::dump([
             'services' => $services
         ], 4);
 
-        $serviceYamlFile = $cacheDir . '/workerman/services.yaml';
+        $locator = new FileLocator($cacheDir . '/workerman');
 
-        $this->writeFile($serviceYamlFile, $content);
+        $file = $locator->locate('services.yaml');
+
+        $this->writeFile($file, $content);
 
         $locator = new FileLocator();
         $loader = new YamlFileLoader($container, $locator, $container->getParameter('kernel.environment'));
-        $loader->load($serviceYamlFile);
+        $loader->load($file);
     }
 
     /**

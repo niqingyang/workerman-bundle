@@ -37,7 +37,6 @@ class Runner implements RunnerInterface
     )
     {
         Worker::$onMasterReload = function () {
-            echo "onMasterReload\n";
             if (function_exists('opcache_get_status')) {
                 if ($status = \opcache_get_status()) {
                     if (isset($status['scripts']) && $scripts = $status['scripts']) {
@@ -93,8 +92,8 @@ class Runner implements RunnerInterface
         ];
 
         foreach ($property_map as $property) {
-            if (isset($config[$property])) {
-                $worker->$property = $config[$property];
+            if (isset($server[$property])) {
+                $worker->$property = $server[$property];
             }
         }
 
