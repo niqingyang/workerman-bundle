@@ -14,6 +14,8 @@
 
 namespace WellKit\WorkermanBundle\DependencyInjection;
 
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
+use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -37,8 +39,8 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('count')->defaultNull()->end()
                         ->scalarNode('user')->defaultNull()->end()
                         ->scalarNode('group')->defaultNull()->end()
-                        ->booleanNode('reloadable')->defaultValue(true)->end()
-                        ->booleanNode('reusePort')->defaultValue(true)->end()
+                        ->booleanNode('reloadable')->defaultTrue()->end()
+                        ->booleanNode('reusePort')->defaultTrue()->end()
                         ->enumNode('transport')->values(['tcp', 'ssl'])->defaultValue('tcp')->end()
                         ->arrayNode('context')->arrayPrototype()->end()->defaultValue([])->end()
                         ->scalarNode('stopTimeout')->defaultValue(2)->end()
@@ -48,7 +50,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('stdoutFile')->defaultValue('')->end()
                     ->end()
                 ->end()
-                ->arrayNode('processIds')->scalarPrototype()->end()
+                ->arrayNode('process')->variablePrototype()->end()
             ->end();
 
         return $treeBuilder;

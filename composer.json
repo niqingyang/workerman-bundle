@@ -15,6 +15,9 @@
     ],
     "require": {
         "php": ">=8.0.2",
+        "ext-pcntl": "*",
+        "ext-posix": "*",
+        "ext-zend-opcache": "*",
         "league/mime-type-detection": "^1.11",
         "nyholm/psr7": "^1.5",
         "symfony/config": "^6.1",
@@ -25,9 +28,7 @@
         "symfony/runtime": "^6.0",
         "symfony/yaml": "^6.1",
         "workerman/psr7": "^1.4",
-        "workerman/workerman": "^4.0",
-        "ext-posix": "*",
-        "ext-pcntl": "*"
+        "workerman/workerman": "^4.0"
     },
     "autoload": {
         "psr-4": {

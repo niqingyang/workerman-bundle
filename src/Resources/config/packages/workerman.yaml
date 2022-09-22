@@ -30,3 +30,6 @@ workerman:
         statusFile: '%kernel.project_dir%/var/log/workerman.status'
         # Stdout file.
         stdoutFile: '%kernel.project_dir%/var/log/workerman.stdout.log'
+    process:
+        xxx:
+            class: xxxx

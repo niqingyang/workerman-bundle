@@ -87,6 +87,9 @@ class Utils
             }
 
             if (isset($config['handler'])) {
+                if (is_callable($config['handler'])) {
+                    $config['handler'] = call_user_func($config['handler']);
+                }
                 static::workerBind($worker, $config['handler']);
             }
         };

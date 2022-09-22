@@ -50,9 +50,13 @@ class Runtime extends SymfonyRuntime
 
     public function getRunner(?object $application): RunnerInterface
     {
-        if ($application instanceof HttpKernelInterface) {
-            return new Runner($application, $this->config, $this->pidFile, $this->logFile, $this->statusFile, $this->stdoutFile);
-        }
-        return parent::getRunner($application);
+        return new Runner($application, $this->config, $this->pidFile, $this->logFile, $this->statusFile, $this->stdoutFile);
+    }
+
+    public function getResolver(callable $callable, ?ReflectionFunction $reflector = null): ResolverInterface
+    {
+        $resolver = parent::getResolver($callable, $reflector);
+
+        return new Resolver($resolver);
     }
 }

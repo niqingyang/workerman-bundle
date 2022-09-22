@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fa682c78604da1e7ced4a0a49fbe1082",
+    "content-hash": "7c1e5c5b7a56ada066d5ecb76062c5bb",
     "packages": [
         {
             "name": "league/mime-type-detection",
@@ -1940,14 +1940,15 @@
     ],
     "packages-dev": [],
     "aliases": [],
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": ">=8.0.2",
+        "ext-pcntl": "*",
         "ext-posix": "*",
-        "ext-pcntl": "*"
+        "ext-zend-opcache": "*"
     },
     "platform-dev": [],
     "plugin-api-version": "2.3.0"

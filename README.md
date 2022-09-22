@@ -54,39 +54,28 @@ workerman:
         statusFile: '%kernel.project_dir%/var/log/workerman.status'
         # Stdout file.
         stdoutFile: '%kernel.project_dir%/var/log/workerman.stdout.log'
+
     # 自定义进程的 serviceId（功能与声明 `workerman.process` 标签相同）
-    processIds:
-        # - xxxxx
-```
+    # 支持 service 相关配置参数：arguments、properties、factory 等
+    # 支持 name、listen、count、user、group、reloadable、reusePort、transport、context 参数设置
+    process:
+        # 自定义进程的名称
+        workerman.xxx:
+            # 自定义进程的类，必须声明 onWorkerStart 方法
+            class: App\Process\XXX
 
-## 自定义进程
-
-- 通过 `/config/services.yaml` 配置
-
-```yaml
-# 自定义进程的名称
-workerman.xxx:
-    # 自定义进程的类，必须声明 onWorkerStart 方法
-    class: App\Process\XXX
-    # workerman-bundle 通过 `workerman.process` 标签来识别自定义进程
-    tags: [ 'workerman.process' ]
-```
-
-## 监听文件变动自动重启
-
-```yaml
-workerman.monitor:
-    class: WellKit\WorkermanBundle\Process\Monitor
-    arguments:
-        # the base dir
-        $basePath: '%kernel.project_dir%'
-        # the monitor dirs
-        $resource: [ './src/', './config/', './public/', './templates/' ]
-        # the file name patterns
-        $patterns: [ '*.php', '*.yaml', '*.html', '*.htm', '*.twig' ]
-        # the exclude dirs
-        $exclude: []
-    tags: [ 'workerman.process' ]
+        # 监听文件变动自动重启
+        workerman.monitor:
+            class: WellKit\WorkermanBundle\Process\Monitor
+            arguments:
+                # the base dir
+                $basePath: '%kernel.project_dir%'
+                # the monitor dirs
+                $resource: [ './src/', './config/', './public/', './templates/' ]
+                # the file name patterns
+                $patterns: [ '*.php', '*.yaml', '*.html', '*.htm', '*.twig' ]
+                # the exclude dirs
+                $exclude: []
 ```
 
 ## 启动
@@ -101,6 +90,7 @@ APP_RUNTIME=WellKit\\WorkermanBundle\\Runtime php ./public/index.php start
 
 - https://github.com/walkor/webman
 - https://github.com/tourze/workerman-server-bundle
+- https://github.com/manyou-io/workerman-symfony-runtime
 
 ## 许可证
 

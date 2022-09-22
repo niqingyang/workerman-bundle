@@ -12,19 +12,23 @@
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
 
-namespace WellKit\WorkermanBundle\DependencyInjection\Compiler;
+namespace WellKit\WorkermanBundle;
 
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
-use WellKit\WorkermanBundle\ConfigLoader;
-use WellKit\WorkermanBundle\Resolver;
+use Closure;
+use Symfony\Component\HttpKernel\KernelInterface;
 
-class ProcessPass implements CompilerPassInterface
+/**
+ * the kernel factory
+ */
+class KernelFactory
 {
-
-    public function process(ContainerBuilder $container)
+    public function __construct(private Closure $app, private array $args)
     {
 
+    }
+
+    public function createKernel(): KernelInterface
+    {
+        return call_user_func($this->app, ...$this->args);
     }
 }
