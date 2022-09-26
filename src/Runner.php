@@ -53,6 +53,8 @@ class Runner implements RunnerInterface
     {
         $kernel = $this->kernelFactory->createKernel();
 
+        $kernel->boot();
+
         $this->environment = $kernel->getEnvironment();
 
         $configLoader = new ConfigLoader($kernel->getCacheDir(), $kernel->isDebug());

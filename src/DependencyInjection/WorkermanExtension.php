@@ -15,15 +15,13 @@
 namespace WellKit\WorkermanBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Yaml\Yaml;
-use WellKit\WorkermanBundle\ConfigLoader;
 
 class WorkermanExtension extends Extension
 {
@@ -61,18 +59,25 @@ class WorkermanExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        $cacheDir = $container->getParameter('kernel.cache_dir');
-        $isDebug = $container->getParameter('kernel.debug');
+        $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
+        $loader->load('workerman.xml');
+
+        $container->getDefinition('workerman.config_loader')->addMethodCall('setConfig', [$config]);
 
         // 加载 process services
-        $this->loadServices($cacheDir, $container, $config);
-
-        // 换成配置
-        $configLoader = new ConfigLoader($cacheDir, $isDebug);
-        $configLoader->setConfig($config);
+        $this->loadProcessServices($container, $config);
     }
 
-    private function loadServices(string $cacheDir, ContainerBuilder $container, array $config)
+    /**
+     * 加载自定义进程服务
+     *
+     * @param string $cacheDir
+     * @param ContainerBuilder $container
+     * @param array $config
+     * @return void
+     * @throws \Exception
+     */
+    private function loadProcessServices(ContainerBuilder $container, array $config)
     {
         $services = [];
 
@@ -96,11 +101,13 @@ class WorkermanExtension extends Extension
             'services' => $services
         ], 4);
 
-        $locator = new FileLocator($cacheDir . '/workerman');
-
-        $file = $locator->locate('services.yaml');
+        $file = $container->getParameter('kernel.cache_dir') . '/workerman/services.yaml';
 
         $this->writeFile($file, $content);
+
+        if (empty($services)) {
+            return;
+        }
 
         $locator = new FileLocator();
         $loader = new YamlFileLoader($container, $locator, $container->getParameter('kernel.environment'));

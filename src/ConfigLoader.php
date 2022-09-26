@@ -28,15 +28,29 @@ class ConfigLoader implements CacheWarmerInterface
     }
 
     /**
+     * get config
+     *
      * @return array
      */
     public function getConfig()
     {
         if (!$this->cache->isFresh()) {
-            $this->warmUp(null);
+            $this->warmUp('');
         }
 
         return require $this->cache->getPath();
+    }
+
+    /**
+     * set config
+     *
+     * @param array $config
+     * @return void
+     */
+    public function setConfig(array $config)
+    {
+        $this->config = $config;
+        $this->warmUp('');
     }
 
     /**
@@ -48,18 +62,8 @@ class ConfigLoader implements CacheWarmerInterface
     }
 
     /**
-     * @param array $config
-     * @return void
-     */
-    public function setConfig(array $config)
-    {
-        $this->config = $config;
-        $this->warmUp('');
-    }
-
-    /**
      * @param string $cacheDir
-     * @return string[]|void
+     * @return void
      */
     public function warmUp(string $cacheDir)
     {
